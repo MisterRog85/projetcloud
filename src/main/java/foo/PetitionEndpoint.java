@@ -55,7 +55,7 @@ public class PetitionEndpoint {
 //		return list;
 //	}
 	
-	public List<Entity> queryForge(DatastoreService datastore, String pseudo){
+	public ArrayList<Entity> queryForge(DatastoreService datastore, String pseudo){
         
 		Filter filter = new FilterPredicate("pseudo", FilterOperator.EQUAL, pseudo);
 		Query query = new Query("UserCloud").setFilter(filter);
@@ -72,7 +72,7 @@ public class PetitionEndpoint {
 		path = "petition/topten", 
 		httpMethod=HttpMethod.GET
 	)
-	public list<Entity> topTenPet(){
+	public ArrayList<Entity> topTenPet(){
 		DatastoreService store = DatastoreServiceFactory.getDatastoreService();
 		Query query = new Query("Petition").addSort("signatures", Query.SortDirection.DESCENDING); 
 		PreparedQuery pq = store.prepare(query);
@@ -97,10 +97,15 @@ public class PetitionEndpoint {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) {	
         try {
-            DatastoreService store = DatastoreServiceFactory.getDatastoreService();
-			Petition pet = new Petition(req.getParameter("owner"), req.getParameter("contenu"), new Date());
-            ofy().save().entity(pet);
-            store.put(pet);
+
+			Entity e = new Entity("Petition");
+			Date d = new Date();
+			DatastoreService store = DatastoreServiceFactory.getDatastoreService();
+			e.setProperty("contenu", req.getParameter("contenu"));
+			e.setProperty("owner", req.getParameter("owner"));
+			e.setProperty("signatures", 0);
+			e.setProperty("date",new Date());
+			store.put(e);
             //resp.sendRedirect("/CreatePetition");
         } catch (IOException e) {
             e.printStackTrace();
@@ -112,21 +117,21 @@ public class PetitionEndpoint {
 	        httpMethod = HttpMethod.GET
 	    )
 	public ArrayList<Petition> getPetitionFollow(@Named("pseudo") String pseudo,@Named("limit") Integer limit){
-		DatastoreService Store = DatastoreServiceFactory.getDatastoreService();
+		DatastoreService store = DatastoreServiceFactory.getDatastoreService();
 		List<Entity> results = queryForge(store, pseudo);
 		for (Entity r : results) {
 			try {
-				Entity e = Store.get(r.getParent());
+				Entity e = store.get(r.getParent());
 				Petition m = new Petition();
 				m.setContenu(e.getProperty("contenu").toString());
 				m.setDate((Date)e.getProperty("date"));
 				m.setParent(e.getParent());
-				list.add(m);
+				results.add(m);
 			} catch (EntityNotFoundException e) {
 				return null;
 			}
 		}
-		return list;
+		return results;
 	}
 
 	// @ApiMethod(
@@ -181,7 +186,7 @@ public class PetitionEndpoint {
 	public List<Entity> getAllPets(){
 		DatastoreService store = DatastoreServiceFactory.getDatastoreService();
 		Query query=new Query("Petition");
-		PreparedQuery pq = datastore.prepare(query);
+		PreparedQuery pq = store.prepare(query);
 		return = pq.asList(FetchOptions.Builder.withDefaults());
 	}
 

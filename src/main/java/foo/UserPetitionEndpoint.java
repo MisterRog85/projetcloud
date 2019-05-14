@@ -31,7 +31,7 @@ public class UserPetitionEndpoint {
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
             DatastoreService store = DatastoreServiceFactory.getDatastoreService();
-            Query query = new Query("User").addSort("listPetitions", SortDirection.DESCENDING);
+            Query query = new Query("User").addSort("listPetitions",  Query.SortDirection.DESCENDING);
             List<Entity> results = store.prepare(query).asList(FetchOptions.Builder.withLimit(100));
 
             this.getServletContext().getRequestDispatcher("../webapp/main.js").forward(req, resp);
@@ -44,10 +44,18 @@ public class UserPetitionEndpoint {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) {	
         try {
+			// UserPetition usr = new UserPetition(req.getParameter("name"));
+            // ofy().save().entity(usr);
+			// store.put(usr);
+			
             DatastoreService store = DatastoreServiceFactory.getDatastoreService();
-			UserPetition usr = new UserPetition(req.getParameter("name"));
-            ofy().save().entity(usr);
-            store.put(usr);
+			Entity user = new Entity("UserCloud");
+			user.setProperty("listPetitions", null);
+			user.setProperty("listPetitionsSignes", null);
+	  		user.setProperty("pseudo",req.getParameter("name"));
+	  		store.put(user);
+
+
             //resp.sendRedirect("/CreatePetition");
         } catch (IOException e) {
             e.printStackTrace();
@@ -120,7 +128,7 @@ public class UserPetitionEndpoint {
 			//IL FAUT RECUPERER LA PETITION ET INCREMENTER SON SIGNATURE!!
 			Entity pet;
 			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-			Filter filter = new FilterPredicate("petition", FilterOperator.EQUAL, pseudo);
+			Filter filter = new FilterPredicate("petition", FilterOperator.EQUAL, petitions);
 			Query query = new Query("Petition").setFilter(filter);
 			PreparedQuery prepQuery = datastore.prepare(query);
 			List<Entity> results = prepQuery.asList(FetchOptions.Builder.withDefaults());
