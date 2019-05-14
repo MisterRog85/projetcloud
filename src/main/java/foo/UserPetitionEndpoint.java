@@ -52,7 +52,7 @@ public class UserPetitionEndpoint {
 			Entity user = new Entity("UserCloud");
 			user.setProperty("listPetitions", null);
 			user.setProperty("listPetitionsSignes", null);
-	  		user.setProperty("pseudo",req.getParameter("name"));
+	  		user.setProperty("name",req.getParameter("name"));
 	  		store.put(user);
 
 
@@ -63,7 +63,7 @@ public class UserPetitionEndpoint {
     }
 	
 	public List<Entity> queryForge(DatastoreService datastore, String pseudo){		        
-		Filter filter = new FilterPredicate("pseudo", FilterOperator.EQUAL, pseudo);
+		Filter filter = new FilterPredicate("name", FilterOperator.EQUAL, pseudo);
 		Query query = new Query("UserCloud").setFilter(filter);
 		PreparedQuery prepQuery = datastore.prepare(query);
 		List<Entity> results = prepQuery.asList(FetchOptions.Builder.withDefaults());
@@ -77,13 +77,13 @@ public class UserPetitionEndpoint {
 	        path = "user/getCloud/{pseudo}",
 	        httpMethod = HttpMethod.GET
 	    )
-	public UserPetition getUserPet(@Named("pseudo") String pseudo) {
+	public UserPetition getUserPet(@Named("name") String pseudo) {
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 		List<Entity> results = queryForge(datastore, pseudo);
 		
 		if(results.size()>0) {
 			Entity e = results.get(0);
-			UserPetition uc = new UserPetition((String)e.getProperty("pseudo"));
+			UserPetition uc = new UserPetition((String)e.getProperty("name"));
 			uc.setListPetitions((ArrayList<String>)e.getProperty("listPetitions"));
 			return uc;
 		}
@@ -103,7 +103,7 @@ public class UserPetitionEndpoint {
 			Entity user = new Entity("UserCloud");
 			user.setProperty("listPetitions", null);
 			user.setProperty("listPetitionsSignes", null);
-	  		user.setProperty("pseudo",u.getNickname());
+	  		user.setProperty("name",u.getNickname());
 	  		datastore.put(user);
 	  		return u;
 		}else {
@@ -116,7 +116,7 @@ public class UserPetitionEndpoint {
 	        path = "user/signPet",
 	        httpMethod = HttpMethod.POST
 	    )
-	public UserPetition signPet(@Named("user") String user, @Named("petition") String petitions) {
+	public UserPetition signPet(@Named("user") String user, @Named("Petition") String petitions) {
 		
 		UserPetition uc = this.getUserPet(user);
 		ArrayList<String> list = uc.getListPetitionsSignes();
@@ -128,7 +128,7 @@ public class UserPetitionEndpoint {
 			//IL FAUT RECUPERER LA PETITION ET INCREMENTER SON SIGNATURE!!
 			Entity pet;
 			DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-			Filter filter = new FilterPredicate("petition", FilterOperator.EQUAL, petitions);
+			Filter filter = new FilterPredicate("Petition", FilterOperator.EQUAL, petitions);
 			Query query = new Query("Petition").setFilter(filter);
 			PreparedQuery prepQuery = datastore.prepare(query);
 			List<Entity> results = prepQuery.asList(FetchOptions.Builder.withDefaults());
@@ -149,7 +149,7 @@ public class UserPetitionEndpoint {
 		if(results.size()>0) {
 			u = results.get(0);
 			u.setProperty("listPetitionsSignes", uc.getListPetitionsSignes());
-	  		u.setProperty("pseudo",uc.getName());
+	  		u.setProperty("name",uc.getName());
 	  		datastore.put(u);
 	  		return uc;
 		} else {

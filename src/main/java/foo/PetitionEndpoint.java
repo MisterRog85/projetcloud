@@ -57,7 +57,7 @@ public class PetitionEndpoint {
 	
 	public ArrayList<Entity> queryForge(DatastoreService datastore, String pseudo){
         
-		Filter filter = new FilterPredicate("pseudo", FilterOperator.EQUAL, pseudo);
+		Filter filter = new FilterPredicate("name", FilterOperator.EQUAL, pseudo);
 		Query query = new Query("UserCloud").setFilter(filter);
 		query.setKeysOnly();
 		PreparedQuery prepQuery = datastore.prepare(query);
@@ -116,7 +116,7 @@ public class PetitionEndpoint {
 	        path = "petition/getuser/{pseudo}/{limit}",
 	        httpMethod = HttpMethod.GET
 	    )
-	public ArrayList<Petition> getPetitionFollow(@Named("pseudo") String pseudo,@Named("limit") Integer limit){
+	public ArrayList<Petition> getPetitionFollow(@Named("name") String pseudo){
 		DatastoreService store = DatastoreServiceFactory.getDatastoreService();
 		List<Entity> results = queryForge(store, pseudo);
 		for (Entity r : results) {

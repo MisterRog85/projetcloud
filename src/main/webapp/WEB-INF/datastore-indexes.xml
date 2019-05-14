@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<datastore-indexes
+  autoGenerate="true">
+    <datastore-index kind="UserCloud" ancestor="false">
+        <property name="name" direction="asc" />
+        <property name="listPetitions" direction="asc" />
+        <property name="listPetitionsSignes" direction="asc" />
+    </datastore-index>
+    <datastore-index kind="Petition" ancestor="false">
+        <property name="owner" direction="asc" />
+        <property name="contenu" direction="asc" />
+        <property name="date" direction="asc" />
+        <property name="signatures" direction="asc" />
+    </datastore-index>
+</datastore-indexes>
